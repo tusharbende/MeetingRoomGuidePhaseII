@@ -155,14 +155,70 @@ public class ScheduleActivity extends Activity {
 
                     for(j = 0; j < timeSlots.size(); j++){
 
-                        if(timeSlots.get(j).equals(MeetingData.get(i).startTime)) {
+                        String timeSlotTime = timeSlots.get(j);
+
+                        String[] splittedTimeSlotTime = timeSlotTime.split(":");
+                        int hoursTimeSlotTime = Integer.valueOf(splittedTimeSlotTime[0]);
+                        String[] splittedTimeSlotTime2 = splittedTimeSlotTime[1].split(" ");
+                        int minutesTimeSlotTime = Integer.valueOf(splittedTimeSlotTime2[0]);
+                        String amOrPmTimeSlotTime = splittedTimeSlotTime2[1];
+                        if(amOrPmTimeSlotTime.equals("pm")){
+                            hoursTimeSlotTime = hoursTimeSlotTime + 12;
+                        }
+
+
+//                        String timeSlotEndTime = timeSlots.get(j+1);
+//
+//                        String[] splittedTimeSlotEndTime = timeSlotEndTime.split(":");
+//                        int hoursTimeSlotEndTime = Integer.valueOf(splittedTimeSlotEndTime[0]);
+//                        String[] splittedTimeSlotEndTime2 = splittedTimeSlotEndTime[1].split(" ");
+//                        int minutesTimeSlotEndTime = Integer.valueOf(splittedTimeSlotEndTime2[0]);
+//                        String amOrPmTimeSlotEndTime = splittedTimeSlotEndTime2[1];
+//                        if(amOrPmTimeSlotEndTime.equals("pm")){
+//                            hoursTimeSlotEndTime = hoursTimeSlotEndTime + 12;
+//                        }
+
+
+                        String meetingStartTime = MeetingData.get(i).startTime;
+                        String[] splittedMeetingStartTime = meetingStartTime.split(":");
+                        int hoursMeetingStartTime = Integer.valueOf(splittedMeetingStartTime[0]);
+                        String[] splittedMeetingStartTime2 = splittedMeetingStartTime[1].split(" ");
+                        int minutesMeetingStartTime = Integer.valueOf(splittedMeetingStartTime2[0]);
+                        String amOrPmMeetingStartTime = splittedMeetingStartTime2[1];
+                        if(amOrPmMeetingStartTime.equals("pm")){
+                            hoursMeetingStartTime = hoursMeetingStartTime + 12;
+                        }
+
+
+                       if(timeSlots.get(j).equals(MeetingData.get(i).startTime) ||
+                                ((hoursTimeSlotTime == hoursMeetingStartTime) &&
+                                        ((minutesTimeSlotTime < 30  && minutesMeetingStartTime < 30) ||
+                                                (minutesTimeSlotTime >= 30  && minutesMeetingStartTime > 30)))) {
 
                             list1.set(j, MeetingData.get(i).title);
                             index = j;
                             index2 = i;
 
                         }
-                        if(timeSlots.get(j).equals(MeetingData.get(i).endTime)){
+
+                        String meetingEndTime = MeetingData.get(i).endTime;
+                        String[] splittedMeetingEndTime = meetingEndTime.split(":");
+                        int hoursMeetingEndTime = Integer.valueOf(splittedMeetingEndTime[0]);
+                        String[] splittedMeetingEndTime2 = splittedMeetingEndTime[1].split(" ");
+                        int minutesMeetingEndTime = Integer.valueOf(splittedMeetingEndTime2[0]);
+                        String amOrPmMeetingEndTime = splittedMeetingEndTime2[1];
+                        if(amOrPmMeetingEndTime.equals("pm")){
+                            hoursMeetingEndTime = hoursMeetingEndTime + 12;
+                        }
+
+                        if(timeSlots.get(j).equals(MeetingData.get(i).endTime) ||
+                                ((hoursTimeSlotTime == hoursMeetingEndTime) &&
+                                        ((minutesTimeSlotTime == 30  && minutesMeetingEndTime < 30))) ||
+
+                                ((hoursTimeSlotTime-1 == hoursMeetingEndTime) &&
+                                        ((minutesTimeSlotTime == 00  && minutesMeetingEndTime > 30)))
+
+                                ) {
 
                             index1 = j;
                             for(k = index; k < index1; k++){
@@ -208,7 +264,7 @@ public class ScheduleActivity extends Activity {
 
                 tv1.setText(list1.get(i));
                 tr.addView(tv1);
-              //  System.out.println();
+                //  System.out.println();
             }
             catch (ArrayIndexOutOfBoundsException e){
                 System.out.println("Error"+e);
@@ -226,7 +282,7 @@ public class ScheduleActivity extends Activity {
             table.removeViewAt(0);
         }
 
-         for (int z = 0; z < table.getChildCount(); z++) {
+        for (int z = 0; z < table.getChildCount(); z++) {
             View view = table.getChildAt(z);
             if (view instanceof TableRow) {
                 int countForRowsWithSameMeeting=1;
@@ -272,11 +328,10 @@ public class ScheduleActivity extends Activity {
                     }
 
                 }
-               // z=z+countForRowsWithSameMeeting-1;
+                // z=z+countForRowsWithSameMeeting-1;
 
             }
 
         }
     }
 }
-

@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Comparator;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -264,7 +262,7 @@ public class MainActivity extends Activity{
                         button.setText(button.getText() + "      (Projector)");
 
                     calendarEventList = getDataForListView(MainActivity.this, meetingRoomNames.get(calendarNames.get(count)).toString());
-                    boolean isongoing = checkOngoingMeeting(calendarEventList);
+                    boolean isongoing = checkOngoingOrUpcomingMeetInHalfHour(calendarEventList);
                     System.out.println("calendarData=   "+calendarData);
 
 //                  Button button = (Button) findViewById(R.id.room1);
@@ -407,7 +405,7 @@ public class MainActivity extends Activity{
 
     // Newly Added Start: Newly added Function for highlighting meeting rooms Red/Green
 
-    public boolean checkOngoingMeeting(List<CalendarList> calendarEventList) {
+    public boolean checkOngoingOrUpcomingMeetInHalfHour(List<CalendarList> calendarEventList) {
 
 
         if (calendarEventList.size() == 0)
@@ -440,6 +438,34 @@ public class MainActivity extends Activity{
             return true;
 
         }
+
+        // Code modification start
+        // Check if there is a meeting in block of 30 mins if yes then mark room as BUSY(RED)
+        // so that user will not be able to book it.
+
+        // code control here means meeting is not ongoing
+        long comparet = Integer.valueOf(calInstanceMeetingEventStart.get(Calendar.HOUR_OF_DAY)).
+                compareTo(calInstanceCurrent.get(Calendar.HOUR_OF_DAY));
+        long x = calInstanceCurrent.get(Calendar.HOUR_OF_DAY);
+        long y = calInstanceMeetingEventStart.get(Calendar.HOUR_OF_DAY);
+
+        if (comparet == 0)//Means meeting is in the current HOUR only
+        {
+            long minCurrent = calInstanceCurrent.get(Calendar.MINUTE);
+            long minMeetingEventStart = calInstanceMeetingEventStart.get(Calendar.MINUTE);
+
+            if ((minCurrent < minMeetingEventStart) && minMeetingEventStart < 30  && minCurrent < 30)
+            {
+                return true;
+            }
+
+            if ((minCurrent < minMeetingEventStart) && minMeetingEventStart > 30  && minCurrent > 30)
+            {
+                return true;
+            }
+
+        }
+        // Code modification end
 
         long compare = Integer.valueOf(calInstanceMeetingEventStart.get(Calendar.HOUR_OF_DAY)).compareTo(calInstanceCurrent.get(Calendar.HOUR_OF_DAY));
 
